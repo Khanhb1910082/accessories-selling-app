@@ -1,0 +1,29 @@
+name: myproject_app
+description: A new Flutter project.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.19.3 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  money_formatter: ^0.0.4
+  flutter_svg: ^2.0.4
+  cloud_firestore: ^4.4.5
+  firebase_auth: ^4.0.0
+  firebase_core: ^2.8.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/logo/
+    - assets/images/
+    - assets/icons/

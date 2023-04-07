@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "36112950618",
+    "firebase_url": "https://turtle-k-b9cec-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "turtle-k-b9cec",
+    "storage_bucket": "turtle-k-b9cec.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:36112950618:android:67c9edf40d2e5d1b163f63",
+        "android_client_info": {
+          "package_name": "com.example.myproject_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "36112950618-okb26e8sd8rjobjpvuno88gtkbge6jjo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1PVZYZbqHbwJo7bajiuPVignju4tKoQc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "36112950618-okb26e8sd8rjobjpvuno88gtkbge6jjo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
