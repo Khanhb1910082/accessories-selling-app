@@ -23,11 +23,11 @@ class _RegisterViewState extends State<RegisterView> {
   late Users user;
   @override
   Widget build(BuildContext context) {
-    precacheImage(img_bg, context);
+    precacheImage(imgbg, context);
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: img_bg,
+          image: imgbg,
           fit: BoxFit.cover,
         ),
       ),
@@ -51,17 +51,6 @@ class _RegisterViewState extends State<RegisterView> {
                       key: _formKey,
                       child: Column(
                         children: [
-                          InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.white24,
-                                  borderRadius: BorderRadius.circular(30)),
-                              child: const Icon(Icons.arrow_back, size: 35),
-                            ),
-                          ),
                           Container(
                               margin: const EdgeInsets.only(bottom: 15),
                               child: const Text(
@@ -79,6 +68,24 @@ class _RegisterViewState extends State<RegisterView> {
                           _buildConfirmPasswordField(),
                           const SizedBox(height: 10),
                           _buildSubmitField(),
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text("Bạn đã có tài khoản? "),
+                              InkWell(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text(
+                                    "Đăng nhập",
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  )),
+                            ],
+                          ),
                         ],
                       ),
                     ),

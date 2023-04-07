@@ -139,7 +139,7 @@ class _OrderStatusViewState extends State<OrderStatusView> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Container(
+                              SizedBox(
                                 width: MediaQuery.of(context).size.width / 1.5,
                                 child: const Text(
                                   "Nếu bạn có bất cứ thắc mắc gì xin vui lòng chat trực tiếp với chúng tôi.",

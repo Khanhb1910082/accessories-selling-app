@@ -1,12 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:myproject_app/model/user.dart';
-import 'package:myproject_app/ui/product/product_view.dart';
 
 import '../screen.dart';
+import 'forgot_pass.dart';
 
-var img_bg = const AssetImage("assets/images/background.png");
+var imgbg = const AssetImage("assets/images/background.png");
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -31,11 +30,11 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    precacheImage(img_bg, context);
+    precacheImage(imgbg, context);
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: img_bg,
+          image: imgbg,
           fit: BoxFit.cover,
         ),
       ),
@@ -192,12 +191,18 @@ class _LoginViewState extends State<LoginView> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Container(
-          margin: const EdgeInsets.all(10),
-          child: const Text(
-            "Quên mật khẩu?",
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
+        InkWell(
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const ForgotPassWord()));
+          },
+          child: Container(
+            margin: const EdgeInsets.all(10),
+            child: const Text(
+              "Quên mật khẩu?",
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ),
@@ -210,7 +215,10 @@ class _LoginViewState extends State<LoginView> {
       children: [
         const Padding(
           padding: EdgeInsets.symmetric(vertical: 15),
-          child: Text("- Đăng nhập với -"),
+          child: Text(
+            "- Đăng nhập với -",
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
         ),
         Row(
           children: [

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 
 import '../model/product.dart';
 
@@ -23,10 +22,6 @@ class ProductService {
     final streamProductList = readProduct();
     final List<Product> productList = await streamProductList.first;
     return productList;
-  }
-
-  Future<QuerySnapshot> getData() async {
-    return await FirebaseFirestore.instance.collection('favoritelist').get();
   }
 
   List item = [];

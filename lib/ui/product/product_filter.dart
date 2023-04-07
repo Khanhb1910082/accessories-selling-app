@@ -121,7 +121,7 @@ class _ProductFilterState extends State<ProductFilter> {
                   ),
                 ),
                 Text(
-                  'Đã bán ',
+                  'Đã bán: ${product.sold}',
                   style: const TextStyle(
                     fontSize: 12,
                   ),

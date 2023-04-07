@@ -38,9 +38,13 @@ class _ProfileDetailState extends State<ProfileDetail> {
             child: Column(
               children: [
                 _buidAvataField(width),
+                const SizedBox(height: 10),
                 _buildEmailField(),
+                const SizedBox(height: 5),
                 _buildAddressField(),
+                const SizedBox(height: 5),
                 _buildPhoneField(),
+                const SizedBox(height: 10),
                 _buildSubmitField(),
               ],
             ),

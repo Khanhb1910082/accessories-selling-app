@@ -65,7 +65,8 @@ class _BottomSheetViewState extends State<BottomSheetView> {
                     const Expanded(
                       child: SizedBox(),
                     ),
-                    Text("Số lượng: ${widget.product.quantity}"),
+                    Text(
+                        "Số lượng: ${widget.product.quantity - widget.product.sold}"),
                   ],
                 ),
               ),
@@ -168,7 +169,8 @@ class _BottomSheetViewState extends State<BottomSheetView> {
                 child: InkWell(
                   onTap: () {
                     setState(() {
-                      if (indexItem < 40) {
+                      if (indexItem <
+                          widget.product.quantity - widget.product.sold) {
                         indexItem++;
                       }
                     });
@@ -252,7 +254,7 @@ class _BottomSheetViewState extends State<BottomSheetView> {
                   MaterialPageRoute(
                       builder: (context) => widget.nameBottom != 'Đặt hàng'
                           ? const CartView()
-                          : OrderView()));
+                          : const OrderView()));
             },
             child: Container(
               padding: const EdgeInsets.all(10),

@@ -1,10 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:myproject_app/model/user.dart';
+import 'package:myproject_app/service/favorite_service.dart';
 import 'package:myproject_app/service/user_service.dart';
-import 'package:myproject_app/ui/product/product_list.dart';
-import 'package:myproject_app/ui/product/product_view.dart';
+import 'package:provider/provider.dart';
 
 import 'ui/screen.dart';
 
@@ -20,13 +19,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Turtle-K Shop',
-      theme: ThemeData(
-        primarySwatch: Colors.pink,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => FavoriteManager()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Turtle-K Shop',
+        theme: ThemeData(
+          primarySwatch: Colors.pink,
+        ),
+        home: const MainPage(),
       ),
-      home: const MainPage(),
     );
   }
 }
@@ -42,9 +46,10 @@ class MainPage extends StatelessWidget {
             stream: UserService.readUser(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return HomeView();
-              } else
-                return LoginView();
+                return const HomeView();
+              } else {
+                return const LoginView();
+              }
             }));
   }
 }

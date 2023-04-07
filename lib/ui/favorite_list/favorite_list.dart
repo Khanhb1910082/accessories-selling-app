@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:money_formatter/money_formatter.dart';
 import 'package:myproject_app/model/product.dart';
+import 'package:myproject_app/ui/product/product_detail.dart';
 
 import '../../service/product_service.dart';
 import '../screen.dart';
@@ -20,7 +21,7 @@ class _FavoriteListViewState extends State<FavoriteListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black12,
+      backgroundColor: const Color.fromARGB(161, 255, 255, 255),
       appBar: AppBar(
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
@@ -73,16 +74,24 @@ class _FavoriteListViewState extends State<FavoriteListView> {
           decoration: const BoxDecoration(color: Colors.white),
           child: Row(
             children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.width / 3.5,
-                width: MediaQuery.of(context).size.width / 3.5,
-                child: Column(
-                  children: [
-                    Image.network(
-                      product.productUrl[0],
-                      fit: BoxFit.cover,
-                    ),
-                  ],
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ProductDetail(product)));
+                },
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.width / 3.5,
+                  width: MediaQuery.of(context).size.width / 3.5,
+                  child: Column(
+                    children: [
+                      Image.network(
+                        product.productUrl[0],
+                        fit: BoxFit.cover,
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Container(
@@ -104,7 +113,7 @@ class _FavoriteListViewState extends State<FavoriteListView> {
                         ),
                       ),
                     ),
-                    Text('Có sẵn: ${product.quantity.toString()}'),
+                    Text('Có sẵn: ${product.quantity - product.sold}'),
                     Text(
                       '${MoneyFormatter(amount: product.price.toDouble()).output.withoutFractionDigits}đ',
                       style: const TextStyle(

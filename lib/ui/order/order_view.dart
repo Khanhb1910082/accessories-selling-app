@@ -395,8 +395,29 @@ class _OrderViewState extends State<OrderView> {
                                       .doc()
                                       .set(cart.docs[index].data(),
                                           SetOptions(merge: false));
+                                  FirebaseFirestore.instance
+                                      .collection('cart')
+                                      .doc(FirebaseAuth
+                                          .instance.currentUser!.email)
+                                      .collection(FirebaseAuth
+                                          .instance.currentUser!.email
+                                          .toString())
+                                      .doc(cart.docs[index].get("id"))
+                                      .delete();
+                                  final total = FirebaseFirestore.instance
+                                      .collection('accessory')
+                                      .doc(cart.docs[index].get("id"));
+                                  final snap = await total.get();
+                                  FirebaseFirestore.instance
+                                      .collection('accessory')
+                                      .doc(cart.docs[index].get("id"))
+                                      .update({
+                                    "sold": snap.get("sold") +
+                                        cart.docs[index].get("quantity")
+                                  });
                                 }
                               }
+                              // ignore: use_build_context_synchronously
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -411,7 +432,8 @@ class _OrderViewState extends State<OrderView> {
                             //         .toString());
                             // var snapshots = await collection.get();
                             // for (var doc in snapshots.docs) {
-                            //   await doc.reference.delete();
+                            //   if (doc.get("id") == 'bag1')
+                            //     print(doc.reference.id.toString());
                             // }
                           },
                           child: Container(
