@@ -21,4 +21,18 @@ class CartService {
 
     await cart.doc().update({"quantity": quantity});
   }
+
+  static Future<bool> checkCart(String idProduct) async {
+    final collection = FirebaseFirestore.instance
+        .collection('cart')
+        .doc(FirebaseAuth.instance.currentUser!.email)
+        .collection(FirebaseAuth.instance.currentUser!.email.toString());
+    final snapshot = await collection.get();
+    for (final id in snapshot.docs) {
+      if (id.reference.id == idProduct) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

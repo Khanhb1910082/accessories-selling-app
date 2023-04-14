@@ -23,6 +23,4 @@ class ProductService {
     final List<Product> productList = await streamProductList.first;
     return productList;
   }
-
-  List item = [];
 }

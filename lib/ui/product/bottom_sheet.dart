@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:money_formatter/money_formatter.dart';
 import 'package:myproject_app/model/cart.dart';
 import 'package:myproject_app/model/product.dart';
+import 'package:myproject_app/service/cart_service.dart';
+import 'package:provider/provider.dart';
+import '../../service/user_service.dart';
+import '../cart/cart_manager.dart';
 import '../screen.dart';
 
 class BottomSheetView extends StatefulWidget {
@@ -18,9 +22,10 @@ class BottomSheetView extends StatefulWidget {
 class _BottomSheetViewState extends State<BottomSheetView> {
   int indexItem = 1;
   int _selectedIndex = 0;
-  @override
+
   @override
   Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartManager>(context);
     double width = MediaQuery.of(context).size.width / 10;
     return Container(
       padding: const EdgeInsets.only(left: 20, right: 20, bottom: 50),
@@ -209,52 +214,141 @@ class _BottomSheetViewState extends State<BottomSheetView> {
           InkWell(
             onTap: () {
               if (widget.nameBottom != 'Đặt hàng') {
-                CollectionReference cart =
-                    FirebaseFirestore.instance.collection('cart');
-                cart
-                    .doc(FirebaseAuth.instance.currentUser!.email)
-                    .collection(
-                        FirebaseAuth.instance.currentUser!.email.toString())
-                    .doc(widget.product.id)
-                    .set(
-                        CartItem(
-                                id: widget.product.id,
-                                productName: widget.product.productName,
-                                productUrl:
-                                    widget.product.productUrl[_selectedIndex],
-                                color: widget.product.color[_selectedIndex],
-                                payment: false,
-                                quantity: indexItem,
-                                price: widget.product.price.toDouble())
-                            .toMap(),
-                        SetOptions(merge: true));
+                Navigator.pop(context);
+
+                CartService.checkCart(widget.product.id +
+                        widget.product.color[_selectedIndex])
+                    .then((value) {
+                  if (value) {
+                    FirebaseFirestore.instance
+                        .collection('cart')
+                        .doc(FirebaseAuth.instance.currentUser!.email)
+                        .collection(
+                            FirebaseAuth.instance.currentUser!.email.toString())
+                        .doc(widget.product.id +
+                            widget.product.color[_selectedIndex])
+                        .set(
+                            CartItem(
+                                    id: widget.product.id,
+                                    productName: widget.product.productName,
+                                    productUrl: widget
+                                        .product.productUrl[_selectedIndex],
+                                    color: widget.product.color[_selectedIndex],
+                                    payment: false,
+                                    quantity: indexItem,
+                                    price: widget.product.price.toDouble())
+                                .toMap(),
+                            SetOptions(merge: true));
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("Sản phẩm đã thêm vào giỏ hàng"),
+                    ));
+                    cartProvider.addToCart(indexItem);
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          content:
+                              const Text("Sản phẩm đã tồn tại trong giỏ hàng"),
+                          actions: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text("OK"))
+                          ],
+                        );
+                      },
+                    );
+                  }
+                });
               } else {
-                CollectionReference cart =
-                    FirebaseFirestore.instance.collection('cart');
-                cart
-                    .doc(FirebaseAuth.instance.currentUser!.email)
-                    .collection(
-                        FirebaseAuth.instance.currentUser!.email.toString())
-                    .doc(widget.product.id)
-                    .set(
-                        CartItem(
-                                id: widget.product.id,
-                                productName: widget.product.productName,
-                                productUrl:
-                                    widget.product.productUrl[_selectedIndex],
-                                color: widget.product.color[_selectedIndex],
-                                payment: true,
-                                quantity: indexItem,
-                                price: widget.product.price.toDouble())
-                            .toMap(),
-                        SetOptions(merge: true));
+                UserService.checkUser().then((value) {
+                  Navigator.pop(context);
+                  if (value) {
+                    CartService.checkCart(widget.product.id +
+                            widget.product.color[_selectedIndex])
+                        .then((value) {
+                      if (value) {
+                        FirebaseFirestore.instance
+                            .collection('cart')
+                            .doc(FirebaseAuth.instance.currentUser!.email)
+                            .collection(FirebaseAuth.instance.currentUser!.email
+                                .toString())
+                            .doc(widget.product.id +
+                                widget.product.color[_selectedIndex])
+                            .set(
+                                CartItem(
+                                        id: widget.product.id,
+                                        productName: widget.product.productName,
+                                        productUrl: widget
+                                            .product.productUrl[_selectedIndex],
+                                        color: widget
+                                            .product.color[_selectedIndex],
+                                        payment: true,
+                                        quantity: indexItem,
+                                        price: widget.product.price.toDouble())
+                                    .toMap(),
+                                SetOptions(merge: true));
+                        cartProvider.addToCart(indexItem);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const OrderView()));
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              content: const Text(
+                                  "Sản phẩm đã tồn tại trong giỏ hàng"),
+                              actions: [
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text("OK"))
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    });
+                  } else if (!value) {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text("Thông tin chưa chính xác"),
+                            content: const Text(
+                              "Cần cập nhật thông tin trước khi đặt hàng",
+                              style: TextStyle(
+                                  fontSize: 17, fontWeight: FontWeight.w400),
+                            ),
+                            actions: [
+                              TextButton(
+                                style: TextButton.styleFrom(
+                                  textStyle:
+                                      Theme.of(context).textTheme.labelLarge,
+                                ),
+                                child: const Text(
+                                  'Ok',
+                                  style: TextStyle(fontSize: 17),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (_) => const ProfileView()));
+                                },
+                              ),
+                            ],
+                          );
+                        });
+                  }
+                }).onError((error, stackTrace) {
+                  Text("Error: ${error.toString()}");
+                });
               }
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => widget.nameBottom != 'Đặt hàng'
-                          ? const CartView()
-                          : const OrderView()));
             },
             child: Container(
               padding: const EdgeInsets.all(10),

@@ -17,12 +17,6 @@ class ProductList extends StatefulWidget {
 
 class _ProductListState extends State<ProductList> {
   @override
-  void initState() {
-    ProductService.readProduct();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Product>>(
         stream: ProductService.readProduct(),
@@ -114,27 +108,27 @@ class _ProductListState extends State<ProductList> {
                                 ),
                               ),
                             ),
-                            InkWell(
-                                onTap: () {
-                                  // final user =
-                                  //     FirebaseAuth.instance.currentUser!.email;
-                                  // final fa = FirebaseFirestore.instance
-                                  //     .collection('favoritelist')
-                                  //     .doc(user)
-                                  //     .collection(user.toString());
-                                  // final snap = await fa.get();
-                                  // for (var doc in snap.docs) {
-                                  //   if (doc.reference.id == product.id) {
-                                  //     isFavorite = true;
-                                  //   } else {
-                                  //     isFavorite = false;
-                                  //   }
-                                  // }
-                                  setState(() {
-                                    isFavorite = !isFavorite;
-                                  });
-                                },
-                                child: Text(isFavorite ? 'true' : 'false')),
+                            // InkWell(
+                            //     onTap: () {
+                            //       // final user =
+                            //       //     FirebaseAuth.instance.currentUser!.email;
+                            //       // final fa = FirebaseFirestore.instance
+                            //       //     .collection('favoritelist')
+                            //       //     .doc(user)
+                            //       //     .collection(user.toString());
+                            //       // final snap = await fa.get();
+                            //       // for (var doc in snap.docs) {
+                            //       //   if (doc.reference.id == product.id) {
+                            //       //     isFavorite = true;
+                            //       //   } else {
+                            //       //     isFavorite = false;
+                            //       //   }
+                            //       // }
+                            //       setState(() {
+                            //         isFavorite = !isFavorite;
+                            //       });
+                            //     },
+                            //     child: Text(isFavorite ? 'true' : 'false')),
                           ],
                         ),
                       ),

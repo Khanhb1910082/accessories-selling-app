@@ -195,7 +195,8 @@ class _RegisterViewState extends State<RegisterView> {
           return;
         }
         FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: _emailController.text, password: _passwordController.text);
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim());
 
         _formKey.currentState!.save();
         FirebaseFirestore.instance
@@ -217,13 +218,14 @@ class _RegisterViewState extends State<RegisterView> {
                 'Đăng nhập ngay để nhận ngay hàng ngàn sản phẩm được trợ giá'),
             actions: <Widget>[
               TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
+                onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const LoginView()),
+                    (route) => false),
+                child: const Text('OK'),
               ),
               TextButton(
-                onPressed: () => Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => const LoginView())),
-                child: const Text('OK'),
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
               ),
             ],
           ),

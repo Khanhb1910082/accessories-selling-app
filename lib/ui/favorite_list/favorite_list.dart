@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,8 +6,10 @@ import 'package:flutter/services.dart';
 import 'package:money_formatter/money_formatter.dart';
 import 'package:myproject_app/model/product.dart';
 import 'package:myproject_app/ui/product/product_detail.dart';
-
+import 'package:provider/provider.dart';
+import 'package:badges/badges.dart' as badges;
 import '../../service/product_service.dart';
+import '../cart/cart_manager.dart';
 import '../screen.dart';
 
 class FavoriteListView extends StatefulWidget {
@@ -20,6 +23,7 @@ class _FavoriteListViewState extends State<FavoriteListView> {
   bool isFavorite = false;
   @override
   Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartManager>(context);
     return Scaffold(
       backgroundColor: const Color.fromARGB(161, 255, 255, 255),
       appBar: AppBar(
@@ -33,9 +37,28 @@ class _FavoriteListViewState extends State<FavoriteListView> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const CartView()));
             },
-            child: const Padding(
-              padding: EdgeInsets.only(right: 12),
-              child: Icon(
+            child: badges.Badge(
+              position: badges.BadgePosition.topEnd(top: -12, end: -12),
+              showBadge: true,
+              ignorePointer: false,
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const CartView()));
+              },
+              badgeContent: Text('${cartProvider.cartCount}'),
+              badgeAnimation: const BadgeAnimation.scale(
+                animationDuration: Duration(seconds: 1),
+                colorChangeAnimationDuration: Duration(seconds: 1),
+                loopAnimation: false,
+                curve: Curves.fastOutSlowIn,
+                colorChangeAnimationCurve: Curves.easeInCubic,
+              ),
+              badgeStyle: badges.BadgeStyle(
+                badgeColor: Colors.deepOrange,
+                borderRadius: BorderRadius.circular(4),
+                elevation: 0,
+              ),
+              child: const Icon(
                 Icons.shopping_cart_outlined,
                 size: 28,
               ),
@@ -137,6 +160,22 @@ class _FavoriteListViewState extends State<FavoriteListView> {
                                 .toString())
                             .doc(product.id)
                             .delete();
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: const Text("Đã bỏ thích sản phẩm"),
+                          action: SnackBarAction(
+                            label: "Hủy",
+                            onPressed: () {
+                              FirebaseFirestore.instance
+                                  .collection("favoritelist")
+                                  .doc(FirebaseAuth.instance.currentUser!.email)
+                                  .collection(FirebaseAuth
+                                      .instance.currentUser!.email
+                                      .toString())
+                                  .doc(product.id)
+                                  .set(product.toMap());
+                            },
+                          ),
+                        ));
                       });
                     },
                     child: const Icon(

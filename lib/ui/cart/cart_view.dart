@@ -3,8 +3,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:money_formatter/money_formatter.dart';
-import 'package:myproject_app/service/cart_service.dart';
+import 'package:myproject_app/service/user_service.dart';
+import 'package:myproject_app/ui/home/home_view.dart';
 import 'package:myproject_app/ui/order/order_view.dart';
+import 'package:myproject_app/ui/profile/profile_detail.dart';
+import 'package:myproject_app/ui/profile/profile_view.dart';
+import 'package:provider/provider.dart';
+
+import 'cart_manager.dart';
 
 class CartView extends StatefulWidget {
   const CartView({super.key});
@@ -15,8 +21,10 @@ class CartView extends StatefulWidget {
 
 class _CartViewState extends State<CartView> {
   bool _checkout = false;
+
   @override
   Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartManager>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Giỏ hàng"),
@@ -57,7 +65,8 @@ class _CartViewState extends State<CartView> {
                                     .collection(FirebaseAuth
                                         .instance.currentUser!.email
                                         .toString())
-                                    .doc(cart.docs[index].get("id"))
+                                    .doc(cart.docs[index].get("id") +
+                                        cart.docs[index].get("color"))
                                     .update({"payment": _checkout});
                               });
                             },
@@ -121,6 +130,32 @@ class _CartViewState extends State<CartView> {
                                 InkWell(
                                   onTap: () {
                                     setState(() {
+                                      cartProvider.deleteToCart(
+                                          cart.docs[index].get("quantity"));
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                        content: const Text(
+                                            "Đã xóa sản phẩm khỏi giỏ hàng."),
+                                        action: SnackBarAction(
+                                          label: 'Hủy',
+                                          onPressed: () {
+                                            FirebaseFirestore.instance
+                                                .collection('cart')
+                                                .doc(FirebaseAuth.instance
+                                                    .currentUser!.email)
+                                                .collection(FirebaseAuth
+                                                    .instance.currentUser!.email
+                                                    .toString())
+                                                .doc(snapshot.data!.docs[index]
+                                                    .get('id'))
+                                                .set(snapshot.data!.docs[index]
+                                                    .data());
+                                            cartProvider.addToCart(cart
+                                                .docs[index]
+                                                .get("quantity"));
+                                          },
+                                        ),
+                                      ));
                                       FirebaseFirestore.instance
                                           .collection('cart')
                                           .doc(FirebaseAuth
@@ -158,6 +193,7 @@ class _CartViewState extends State<CartView> {
                                                       .get("quantity") -
                                                   1
                                             });
+                                            cartProvider.deleteToCart(1);
                                           }
                                         });
                                       },
@@ -212,6 +248,7 @@ class _CartViewState extends State<CartView> {
                                                       .get("quantity") +
                                                   1,
                                             });
+                                            cartProvider.addToCart(1);
                                           }
                                         });
                                       },
@@ -329,12 +366,98 @@ class _CartViewState extends State<CartView> {
                         ),
                         InkWell(
                           onTap: () {
-                            if (snapshot.data!.size != 0) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const OrderView()));
-                            }
+                            UserService.checkUser().then((value) {
+                              if (sum == 0) {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text(
+                                            "Không tìm thấy sản phẩm"),
+                                        content: const Text(
+                                          "Vui lòng chọn sản phẩm bạn muốn thanh toán",
+                                          style: TextStyle(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            style: TextButton.styleFrom(
+                                              textStyle: Theme.of(context)
+                                                  .textTheme
+                                                  .labelLarge,
+                                            ),
+                                            child: const Text(
+                                              'Ok',
+                                              style: TextStyle(fontSize: 17),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              } else if (!value) {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text(
+                                            "Thông tin chưa chính xác"),
+                                        content: const Text(
+                                          "Cần cập nhật thông tin trước khi đặt hàng",
+                                          style: TextStyle(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            style: TextButton.styleFrom(
+                                              textStyle: Theme.of(context)
+                                                  .textTheme
+                                                  .labelLarge,
+                                            ),
+                                            child: const Text(
+                                              'Ok',
+                                              style: TextStyle(fontSize: 17),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.of(context)
+                                                  .pushAndRemoveUntil(
+                                                MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        const HomeView(
+                                                          2,
+                                                        )),
+                                                (route) => false,
+                                              );
+                                            },
+                                          ),
+                                          TextButton(
+                                            style: TextButton.styleFrom(
+                                              textStyle: Theme.of(context)
+                                                  .textTheme
+                                                  .labelLarge,
+                                            ),
+                                            child: const Text(
+                                              'Cancel',
+                                              style: TextStyle(fontSize: 17),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              } else {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (_) => const OrderView()));
+                              }
+                            }).onError((error, stackTrace) {
+                              Text("Error: ${error.toString()}");
+                            });
                           },
                           child: Container(
                             height: widthDevice / 7,

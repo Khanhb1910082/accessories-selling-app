@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,10 @@ import 'package:myproject_app/model/product.dart';
 import 'package:myproject_app/ui/cart/cart_view.dart';
 import 'package:myproject_app/ui/product/product_detail_bottom.dart';
 import 'package:myproject_app/ui/product/product_filter.dart';
+import 'package:badges/badges.dart' as badges;
+import 'package:provider/provider.dart';
+
+import '../cart/cart_manager.dart';
 
 class ProductDetail extends StatefulWidget {
   const ProductDetail(this.product, {super.key});
@@ -20,28 +25,56 @@ class _ProductDetailState extends State<ProductDetail> {
   final user = FirebaseAuth.instance.currentUser!.email;
   @override
   Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartManager>(context);
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(1, 0, 0, 0),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: InkWell(
+          InkWell(
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const CartView()));
+            },
+            child: badges.Badge(
+              position: badges.BadgePosition.topEnd(top: -12, end: -12),
+              showBadge: true,
+              ignorePointer: false,
               onTap: () {
-                Navigator.of(context).push(
+                Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const CartView()));
               },
+              badgeContent: Text(
+                '${cartProvider.cartCount}',
+                style: const TextStyle(
+                    fontWeight: FontWeight.w500, fontSize: 14.5),
+              ),
+              badgeAnimation: const BadgeAnimation.scale(
+                animationDuration: Duration(seconds: 1),
+                colorChangeAnimationDuration: Duration(seconds: 1),
+                loopAnimation: false,
+                curve: Curves.fastOutSlowIn,
+                colorChangeAnimationCurve: Curves.easeInCubic,
+              ),
+              badgeStyle: badges.BadgeStyle(
+                badgeColor: Colors.white38,
+                borderRadius: BorderRadius.circular(4),
+                elevation: 0,
+              ),
               child: const Icon(
                 Icons.shopping_cart_outlined,
                 size: 28,
+                color: Colors.pinkAccent,
               ),
             ),
           ),
           const Padding(
               padding: EdgeInsets.only(right: 12),
-              child: Icon(Icons.chat_outlined)),
+              child: Icon(
+                Icons.chat_outlined,
+                color: Colors.pinkAccent,
+              )),
         ],
         elevation: 0,
       ),

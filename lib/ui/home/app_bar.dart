@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:myproject_app/ui/cart/cart_view.dart';
+import 'package:provider/provider.dart';
+import 'package:badges/badges.dart' as badges;
+import '../cart/cart_manager.dart';
 
 class AppbarView extends StatefulWidget {
   const AppbarView({super.key});
@@ -11,6 +14,7 @@ class AppbarView extends StatefulWidget {
 class _AppbarViewState extends State<AppbarView> {
   @override
   Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartManager>(context);
     return AppBar(
       //backgroundColor: const Color.fromARGB(1, 0, 0, 0),
       title: Container(
@@ -46,9 +50,13 @@ class _AppbarViewState extends State<AppbarView> {
             ),
           ),
         ),
-        const Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: Icon(Icons.chat_outlined)),
+        badges.Badge(
+          badgeContent: Text('3'),
+          child: Icon(Icons.settings),
+        ),
+        // const Padding(
+        //     padding: EdgeInsets.only(right: 12),
+        //     child: Icon(Icons.chat_outlined)),
       ],
       elevation: 0,
     );

@@ -12,7 +12,7 @@ class OrderStatusView extends StatefulWidget {
 
 class _OrderStatusViewState extends State<OrderStatusView> {
   final user = FirebaseAuth.instance.currentUser!.email;
-
+  String status = "Hủy đơn hàng";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,26 +20,22 @@ class _OrderStatusViewState extends State<OrderStatusView> {
         title: const Text("Đơn hàng"),
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection('orders')
-            .doc(user)
-            .collection(user.toString())
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text("Lỗi xảy ra"),
-            );
-          } else if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            final product = snapshot.data!;
-            return ListView(
-              children: [
-                for (int index = 0; index < product.docs.length; index++)
-                  Container(
+          stream: FirebaseFirestore.instance
+              .collection('orders')
+              .doc(user)
+              .collection(user.toString())
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return const Center(
+                child: Text("Lỗi xảy ra"),
+              );
+            } else if (snapshot.hasData && snapshot.data!.size != 0) {
+              final product = snapshot.data!;
+              return ListView.builder(
+                itemCount: product.docs.length,
+                itemBuilder: (context, index) {
+                  return Container(
                     margin: const EdgeInsets.only(bottom: 10),
                     decoration: const BoxDecoration(color: Colors.white),
                     child: Column(
@@ -92,20 +88,6 @@ class _OrderStatusViewState extends State<OrderStatusView> {
                                 ],
                               ),
                             ),
-                            // Column(
-                            //   children: [
-                            //     InkWell(
-                            //       onTap: () {
-                            //         setState(() {});
-                            //       },
-                            //       child: const Icon(
-                            //         Icons.favorite_outlined,
-                            //         size: 28,
-                            //         color: Colors.pink,
-                            //       ),
-                            //     ),
-                            //   ],
-                            // )
                           ],
                         ),
                         Container(
@@ -146,19 +128,25 @@ class _OrderStatusViewState extends State<OrderStatusView> {
                                 ),
                               ),
                               ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    setState(() {
+                                      status = "Đã hủy đơn";
+                                    });
+                                  },
                                   child: const Text("Hủy đơn hàng"))
                             ],
                           ),
                         )
                       ],
                     ),
-                  ),
-              ],
+                  );
+                },
+              );
+            }
+            return const Center(
+              child: Text("Bạn chưa có đơn hàng nào."),
             );
-          }
-        },
-      ),
+          }),
     );
   }
 }

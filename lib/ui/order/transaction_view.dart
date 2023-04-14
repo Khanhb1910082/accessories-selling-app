@@ -42,7 +42,9 @@ class _TransactionViewState extends State<TransactionView> {
                           Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const HomeView()),
+                                  builder: (context) => const HomeView(
+                                        0,
+                                      )),
                               (route) => false);
                         },
                         child: const Text("Trang chủ"))

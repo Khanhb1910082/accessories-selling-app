@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:money_formatter/money_formatter.dart';
 import 'package:myproject_app/model/user.dart';
 import 'package:myproject_app/service/user_service.dart';
+import 'package:provider/provider.dart';
 
+import '../cart/cart_manager.dart';
 import '../screen.dart';
 
 class OrderView extends StatefulWidget {
@@ -300,7 +302,7 @@ class _OrderViewState extends State<OrderView> {
 
   _buildBottomBar() {
     double widthDevice = MediaQuery.of(context).size.width;
-
+    final cartProvider = Provider.of<CartManager>(context);
     return StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('cart')
@@ -379,6 +381,10 @@ class _OrderViewState extends State<OrderView> {
                         ),
                         InkWell(
                           onTap: () async {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const TransactionView()));
                             if (snapshot.data!.size != 0) {
                               final cart = snapshot.data!;
                               for (int index = 0;
@@ -395,15 +401,7 @@ class _OrderViewState extends State<OrderView> {
                                       .doc()
                                       .set(cart.docs[index].data(),
                                           SetOptions(merge: false));
-                                  FirebaseFirestore.instance
-                                      .collection('cart')
-                                      .doc(FirebaseAuth
-                                          .instance.currentUser!.email)
-                                      .collection(FirebaseAuth
-                                          .instance.currentUser!.email
-                                          .toString())
-                                      .doc(cart.docs[index].get("id"))
-                                      .delete();
+
                                   final total = FirebaseFirestore.instance
                                       .collection('accessory')
                                       .doc(cart.docs[index].get("id"));
@@ -417,24 +415,20 @@ class _OrderViewState extends State<OrderView> {
                                   });
                                 }
                               }
-                              // ignore: use_build_context_synchronously
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const TransactionView()));
                             }
-                            // var collection = FirebaseFirestore.instance
-                            //     .collection('orders')
-                            //     .doc(FirebaseAuth.instance.currentUser!.email)
-                            //     .collection(FirebaseAuth
-                            //         .instance.currentUser!.email
-                            //         .toString());
-                            // var snapshots = await collection.get();
-                            // for (var doc in snapshots.docs) {
-                            //   if (doc.get("id") == 'bag1')
-                            //     print(doc.reference.id.toString());
-                            // }
+                            var collection = FirebaseFirestore.instance
+                                .collection('cart')
+                                .doc(FirebaseAuth.instance.currentUser!.email)
+                                .collection(FirebaseAuth
+                                    .instance.currentUser!.email
+                                    .toString());
+                            var snapshots = await collection.get();
+                            for (var doc in snapshots.docs) {
+                              if (doc.get("payment") == true) {
+                                doc.reference.delete();
+                                cartProvider.deleteToCart(doc.get('quantity'));
+                              }
+                            }
                           },
                           child: Container(
                             height: widthDevice / 7,

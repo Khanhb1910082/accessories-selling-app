@@ -16,12 +16,21 @@ dependencies:
   cloud_firestore: ^4.4.5
   firebase_auth: ^4.0.0
   firebase_core: ^2.8.0
+  badges: ^3.0.3
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.0
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
-
+  flutter_native_splash: ^2.2.19
+flutter_native_splash:
+  background_image: assets/images/background.png
+  image: assets/logo/logo.png
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logo/turtle_icon.png"
 flutter:
   uses-material-design: true
   assets:

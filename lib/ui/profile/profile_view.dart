@@ -1,10 +1,13 @@
+import 'package:badges/badges.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myproject_app/service/user_service.dart';
 import 'package:myproject_app/ui/profile/profile_detail.dart';
 import 'package:myproject_app/ui/screen.dart';
-
+import 'package:provider/provider.dart';
+import 'package:badges/badges.dart' as badges;
 import '../../model/user.dart';
+import '../cart/cart_manager.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -16,31 +19,50 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartManager>(context);
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.white60,
       appBar: AppBar(
-          actions: [
-            InkWell(
+        actions: [
+          InkWell(
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const CartView()));
+            },
+            child: badges.Badge(
+              position: badges.BadgePosition.topEnd(top: -12, end: -12),
+              showBadge: true,
+              ignorePointer: false,
               onTap: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const CartView()));
               },
-              child: const Padding(
-                padding: EdgeInsets.only(right: 12),
-                child: Icon(
-                  Icons.shopping_cart_outlined,
-                  size: 28,
-                ),
+              badgeContent: Text('${cartProvider.cartCount}'),
+              badgeAnimation: const BadgeAnimation.scale(
+                animationDuration: Duration(seconds: 1),
+                colorChangeAnimationDuration: Duration(seconds: 1),
+                loopAnimation: false,
+                curve: Curves.fastOutSlowIn,
+                colorChangeAnimationCurve: Curves.easeInCubic,
+              ),
+              badgeStyle: badges.BadgeStyle(
+                badgeColor: Colors.deepOrange,
+                borderRadius: BorderRadius.circular(4),
+                elevation: 0,
+              ),
+              child: const Icon(
+                Icons.shopping_cart_outlined,
+                size: 28,
               ),
             ),
-            const Padding(
-                padding: EdgeInsets.only(right: 12),
-                child: Icon(Icons.chat_outlined)),
-          ],
-          bottom: PreferredSize(
-              preferredSize: Size(width, width / 5),
-              child: _buidAvataField(width))),
+          ),
+          const Padding(
+              padding: EdgeInsets.only(right: 12, top: 16),
+              child: Icon(Icons.chat_outlined)),
+        ],
+        bottom: PreferredSize(
+            preferredSize: Size(width, width / 5), child: _buidAvataField()),
+      ),
       body: StreamBuilder<List<Users>>(
           stream: UserService.readUser(),
           builder: (context, snapshot) {
@@ -61,6 +83,7 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Widget _buildUser(Users user) {
+    final cartProvider = Provider.of<CartManager>(context);
     double widthDevice = MediaQuery.of(context).size.width;
     return Center(
       child: Column(children: [
@@ -130,6 +153,11 @@ class _ProfileViewState extends State<ProfileView> {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const LoginView()),
                   (route) => false);
+              cartProvider.clearCart();
+            }).onError((error, stackTrace) {
+              Center(
+                child: Text("Error ${error.toString()}"),
+              );
             });
           },
           child: Container(
@@ -159,8 +187,29 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  Widget _buidAvataField(double width) {
-    final user = FirebaseAuth.instance.currentUser!.email;
+  Widget _buidAvataField() {
+    return StreamBuilder(
+        stream: UserService.readUser(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(
+              child: Text("Hệ thống đang được bảo trì"),
+            );
+          } else if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            final user = snapshot.data!;
+            return Column(
+              children: user.map(_buidUserDetail).toList(),
+            );
+          }
+        });
+  }
+
+  Widget _buidUserDetail(Users user) {
+    double width = MediaQuery.of(context).size.width;
     return Row(
       children: [
         Column(
@@ -185,7 +234,7 @@ class _ProfileViewState extends State<ProfileView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              user.toString(),
+              user.email,
               style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,

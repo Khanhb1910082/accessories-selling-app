@@ -1,14 +1,23 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:myproject_app/ui/product/product_list.dart';
-
+import 'package:badges/badges.dart' as badges;
+import 'package:provider/provider.dart';
+import '../cart/cart_manager.dart';
 import '../screen.dart';
 
-class ProductView extends StatelessWidget {
+class ProductView extends StatefulWidget {
   const ProductView({super.key});
 
   @override
+  State<ProductView> createState() => _ProductViewState();
+}
+
+class _ProductViewState extends State<ProductView> {
+  @override
   Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartManager>(context);
     return Scaffold(
         appBar: AppBar(
           systemOverlayStyle: const SystemUiOverlayStyle(
@@ -39,9 +48,30 @@ class ProductView extends StatelessWidget {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const CartView()));
               },
-              child: const Padding(
-                padding: EdgeInsets.only(right: 12),
-                child: Icon(
+              child: badges.Badge(
+                position: badges.BadgePosition.topEnd(top: -12, end: -12),
+                showBadge: true,
+                ignorePointer: false,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const CartView()));
+                },
+                badgeContent: Text('${cartProvider.cartCount}'),
+                badgeAnimation: const BadgeAnimation.scale(
+                  animationDuration: Duration(seconds: 1),
+                  colorChangeAnimationDuration: Duration(seconds: 1),
+                  loopAnimation: false,
+                  curve: Curves.fastOutSlowIn,
+                  colorChangeAnimationCurve: Curves.easeInCubic,
+                ),
+                badgeStyle: badges.BadgeStyle(
+                  badgeColor: Colors.deepOrange,
+                  borderRadius: BorderRadius.circular(4),
+                  elevation: 0,
+                ),
+                child: const Icon(
                   Icons.shopping_cart_outlined,
                   size: 28,
                 ),
@@ -52,6 +82,6 @@ class ProductView extends StatelessWidget {
                 child: Icon(Icons.chat_outlined)),
           ],
         ),
-        body: ListView(children: [ProductList()]));
+        body: ListView(children: const [ProductList()]));
   }
 }
